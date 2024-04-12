@@ -1,11 +1,15 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const TokenSchema = new mongoose.Schema({
+export interface IToken extends Document {
+  token: string;
+}
+
+const TokenSchema: Schema = new Schema({
   token: {
     type: String,
     required: true,
   },
 });
 
-const Token = mongoose.model("token", TokenSchema);
+const Token = mongoose.model<IToken>("Token", TokenSchema);
 export default Token;

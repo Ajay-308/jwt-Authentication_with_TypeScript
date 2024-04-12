@@ -1,5 +1,5 @@
 import grid from "gridfs-stream";
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 import { Request, Response } from "express";
 
 const url = "http://localhost:5000";
@@ -16,21 +16,23 @@ conn.once("open", () => {
 
 export const uploadImage = (req: Request, res: Response) => {
   if (!req.file) {
-    return res.status(404).json({ msg: "File not found" });
+    return res.status(400).json({ error: "File not found" });
   }
 
   const imageUrl = `${url}/file/${req.file.filename}`;
 
-  return res.status(200).json(imageUrl);
+  return res.status(200).json({ imageUrl });
 };
 
-export const getImage = async (req: Request, res: Response) => {
+export const getImage = (req: Request, res: Response) => {
+  const filename = req.params.filename;
   try {
-    const file = await gfs.files.findOne({ filename: req.params.filename });
-    // const readStream = gfs.createReadStream(file.filename);
-    const readStream = gridfsBucket.openDownloadStream(file._id);
+    const readStream = gridfsBucket.openDownloadStreamByName(filename);
+    readStream.on("error", (error: any) => {
+      res.status(404).json({ error: "File not found" });
+    });
     readStream.pipe(res);
   } catch (error) {
-    res.status(500).json({ msg: error });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

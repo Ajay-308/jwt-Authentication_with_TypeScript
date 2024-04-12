@@ -1,5 +1,4 @@
-import express from "express";
-
+import express, { Router } from "express";
 import {
   createComment,
   deleteComment,
@@ -24,15 +23,13 @@ import {
   createNewToken,
 } from "../controllers/jwt-controller";
 
-const router = express.Router();
+const router: Router = express.Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 
-router.post("token", createNewToken);
-
-//middleware->> jaate waqt mujhse milkar jana
+router.post("/token", createNewToken);
 
 router.post("/post", authorizationToken, createPost);
 router.put("/update/:id", authorizationToken, updatePost);

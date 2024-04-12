@@ -1,55 +1,78 @@
-import { Comment } from "../model/comment";
+import { Comment, IComment } from "../model/comment";
 import { Request, Response } from "express";
 
-//jldi jldi comment kardu
 export const createComment = async (req: Request, res: Response) => {
   try {
-    const comment = await new Comment(req.body).save();
+    const comment: IComment = await new Comment(req.body).save();
     res.status(201).send({
       success: true,
-      message: "comment created successfully",
+      message: "Comment created successfully",
+      comment: comment,
     });
   } catch (error) {
-    res.status(500).send(`there is an error while creating comment:${error}`);
+    res.status(500).send(`Error creating comment: ${error.message}`);
   }
 };
 
-//getting all created comments
 export const getComment = async (req: Request, res: Response) => {
   try {
-    const comment = await Comment.findById(req.params.id);
+    const comment: IComment | null = await Comment.findById(req.params.id);
+    if (!comment) {
+      return res.status(404).send({
+        success: false,
+        message: "Comment not found",
+      });
+    }
     res.status(200).send({
       success: true,
-      message: "comment found successfully",
+      message: "Comment found successfully",
+      comment: comment,
     });
   } catch (error) {
-    res.status(500).send(`there is an error while founding comment:${error}`);
+    res.status(500).send(`Error finding comment: ${error.message}`);
   }
 };
 
-//find by id and update it with the request body
 export const updateComment = async (req: Request, res: Response) => {
   try {
-    const comment = await Comment.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const comment: IComment | null = await Comment.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!comment) {
+      return res.status(404).send({
+        success: false,
+        message: "Comment not found",
+      });
+    }
     res.status(200).send({
       success: true,
-      message: "comment updated successfully",
+      message: "Comment updated successfully",
+      comment: comment,
     });
   } catch (error) {
-    res.status(500).send(`there is an error while Updating comment:${error}`);
+    res.status(500).send(`Error updating comment: ${error.message}`);
   }
 };
 
 export const deleteComment = async (req: Request, res: Response) => {
   try {
-    const comment = await Comment.findByIdAndDelete(req.params.id);
+    const comment: IComment | null = await Comment.findByIdAndDelete(
+      req.params.id
+    );
+    if (!comment) {
+      return res.status(404).send({
+        success: false,
+        message: "Comment not found",
+      });
+    }
     res.status(200).send({
       success: true,
-      message: "comment deleted successfully",
+      message: "Comment deleted successfully",
+      comment: comment,
     });
   } catch (error) {
-    res.status(500).send(`there is an error while deleting comment:${error}`);
+    res.status(500).send(`Error deleting comment: ${error.message}`);
   }
 };

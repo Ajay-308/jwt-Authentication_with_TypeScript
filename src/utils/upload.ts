@@ -3,18 +3,21 @@ import { GridFsStorage } from "multer-gridfs-storage";
 import dotenv from "dotenv";
 dotenv.config();
 
-const username = process.env.DB_USERNAME;
-const password = process.env.DB_PASSWORD;
+const uri = process.env.MONGODB_URI; // Update your environment variable name to reflect the MongoDB URI
+if (!uri) {
+  throw new Error("MongoDB URI is not provided in the environment variables.");
+}
 
 const storage = new GridFsStorage({
-  //   url: `mongodb+srv://${username}:${password}@blog-website.ndfvfgj.mongodb.net/blog-website?retryWrites=true&w=majority`,
-  url: `mongodb+srv://ajay:<password>@ajay.syx8afb.mongodb.net/ajay?retryWrites=true&w=majority`,
-  options: { useNewUrlParser: true },
+  url: uri,
+  options: { useNewUrlParser: true, useUnifiedTopology: true }, // Add useUnifiedTopology option
   file: (request, file) => {
-    const match = ["image/png", "image/jpg"];
+    const match = ["image/png", "image/jpeg"]; // Corrected typo from "image/jpg" to "image/jpeg"
 
-    if (match.indexOf(file.memeType) === -1)
-      return `${Date.now()}-blog-${file.originalname}`; //remove dupllicate image
+    if (match.indexOf(file.mimetype) === -1) {
+      // Corrected typo from "file.memeType" to "file.mimetype"
+      return `${Date.now()}-blog-${file.originalname}`; // remove duplicate image
+    }
 
     return {
       bucketName: "photos",
@@ -23,4 +26,6 @@ const storage = new GridFsStorage({
   },
 });
 
-export default multer({ storage });
+const upload = multer({ storage });
+
+export default upload;
